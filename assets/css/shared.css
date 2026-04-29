@@ -1,0 +1,101 @@
+:root {
+  --bg: #0b0d10;
+  --bg-2: #0f1216;
+  --panel: #12161c;
+  --panel-2: #161b22;
+  --line: #232a33;
+  --line-2: #2d3742;
+  --ink: #e6edf3;
+  --ink-dim: #9aa6b2;
+  --ink-faint: #6b7685;
+  --accent: #7dd3fc;
+  --accent-dim: #38bdf8;
+  --good: #22c55e;
+  --bad: #f87171;
+  --warn: #f59e0b;
+  --radius: 14px;
+  --radius-sm: 8px;
+}
+
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+html { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font: 15px/1.65 -apple-system, BlinkMacSystemFont, "Helvetica Neue", Helvetica, Arial, sans-serif;
+  min-height: 100vh;
+}
+
+code, pre, .mono {
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+}
+
+a { color: var(--accent); text-decoration: none; }
+a:hover { color: var(--accent-dim); }
+
+.wrap {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 0 32px;
+}
+
+/* ── Nav ── */
+.site-nav {
+  background: var(--bg-2);
+  border-bottom: 1px solid var(--line);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.site-nav .wrap {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 56px;
+}
+
+.site-name {
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--ink);
+  letter-spacing: -0.02em;
+}
+
+.site-name:hover { color: var(--accent); }
+
+.nav-links { display: flex; gap: 20px; align-items: center; }
+
+.nav-links a {
+  font-size: 13px;
+  color: var(--ink-dim);
+  transition: color 0.15s;
+}
+
+.nav-links a:hover { color: var(--ink); }
+
+/* ── Footer ── */
+.site-footer {
+  margin-top: 80px;
+  padding: 32px 0;
+  border-top: 1px solid var(--line);
+}
+
+.site-footer .wrap {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.site-footer p {
+  font-size: 13px;
+  color: var(--ink-faint);
+}
+
+/* ── Responsive ── */
+@media (max-width: 700px) {
+  .wrap { padding: 0 18px; }
+  .site-nav .wrap { height: 48px; }
+}
