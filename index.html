@@ -6,8 +6,91 @@
   <title>iamasx — Blog</title>
   <link rel="stylesheet" href="assets/css/shared.css">
   <style>
+    html { scroll-behavior: smooth; }
+
+    /* ── Ambient background ── */
+    .ambient {
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      overflow: hidden;
+      pointer-events: none;
+    }
+
+    .orb {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(80px);
+      opacity: 0.12;
+      animation: float 20s ease-in-out infinite;
+    }
+
+    .orb-1 {
+      width: 600px; height: 600px;
+      background: radial-gradient(circle, #7dd3fc, transparent 70%);
+      top: -10%; left: -10%;
+      animation-delay: 0s;
+    }
+
+    .orb-2 {
+      width: 500px; height: 500px;
+      background: radial-gradient(circle, #a78bfa, transparent 70%);
+      top: 40%; right: -15%;
+      animation-delay: -7s;
+      animation-duration: 25s;
+    }
+
+    .orb-3 {
+      width: 400px; height: 400px;
+      background: radial-gradient(circle, #38bdf8, transparent 70%);
+      bottom: -10%; left: 30%;
+      animation-delay: -14s;
+      animation-duration: 22s;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      25% { transform: translate(40px, -30px) scale(1.05); }
+      50% { transform: translate(-20px, 20px) scale(0.95); }
+      75% { transform: translate(30px, 40px) scale(1.02); }
+    }
+
+    /* ── Dot grid ── */
+    .dot-grid {
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      background-image: radial-gradient(circle, rgba(125, 211, 252, 0.04) 1px, transparent 1px);
+      background-size: 32px 32px;
+      pointer-events: none;
+    }
+
+    /* ── Mouse glow ── */
+    .mouse-glow {
+      position: fixed;
+      width: 500px;
+      height: 500px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(125, 211, 252, 0.06), transparent 70%);
+      pointer-events: none;
+      z-index: -1;
+      transform: translate(-50%, -50%);
+      transition: left 0.3s ease-out, top 0.3s ease-out;
+    }
+
+    /* ── Nav ── */
+    .site-nav {
+      background: rgba(15, 18, 22, 0.6);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      animation: fadeDown 0.8s ease-out;
+    }
+
+    /* ── Hero header ── */
     .site-header {
-      padding: 72px 0 48px;
+      padding: 100px 0 64px;
+      text-align: center;
+      position: relative;
     }
 
     .site-header .eyebrow {
@@ -17,9 +100,11 @@
       font-size: 12px;
       font-weight: 600;
       text-transform: uppercase;
-      letter-spacing: 0.08em;
+      letter-spacing: 0.12em;
       color: var(--accent);
-      margin-bottom: 16px;
+      margin-bottom: 24px;
+      opacity: 0;
+      animation: fadeUp 0.7s ease-out 0.2s forwards;
     }
 
     .site-header .eyebrow .dot {
@@ -27,70 +112,191 @@
       height: 7px;
       border-radius: 50%;
       background: var(--accent);
+      animation: pulse 2s ease-in-out infinite;
+      box-shadow: 0 0 12px rgba(125, 211, 252, 0.5);
     }
 
     .site-header h1 {
-      font-size: 48px;
-      font-weight: 700;
-      letter-spacing: -0.03em;
-      color: #fff;
-      margin-bottom: 10px;
+      font-size: 72px;
+      font-weight: 800;
+      letter-spacing: -0.04em;
+      line-height: 1;
+      margin-bottom: 20px;
+      background: linear-gradient(135deg, #fff 0%, #7dd3fc 50%, #a78bfa 100%);
+      background-size: 200% 200%;
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      animation: fadeUp 0.7s ease-out 0.35s forwards, gradientShift 8s ease-in-out infinite;
+      opacity: 0;
     }
 
     .site-header .sub {
-      font-size: 17px;
+      font-size: 18px;
       color: var(--ink-dim);
-      line-height: 1.5;
+      line-height: 1.6;
+      max-width: 440px;
+      margin: 0 auto;
+      opacity: 0;
+      animation: fadeUp 0.7s ease-out 0.5s forwards;
+    }
+
+    .header-line {
+      width: 60px;
+      height: 2px;
+      background: linear-gradient(90deg, var(--accent), #a78bfa);
+      margin: 40px auto 0;
+      border-radius: 2px;
+      opacity: 0;
+      animation: scaleIn 0.6s ease-out 0.7s forwards;
+    }
+
+    /* ── Section title ── */
+    .section-label {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 32px;
+      opacity: 0;
+      animation: fadeUp 0.7s ease-out 0.8s forwards;
+    }
+
+    .section-label span {
+      font-size: 13px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--ink-faint);
+      white-space: nowrap;
+    }
+
+    .section-label::after {
+      content: "";
+      flex: 1;
+      height: 1px;
+      background: linear-gradient(90deg, var(--line), transparent);
     }
 
     /* ── Blog grid ── */
     .blog-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(480px, 1fr));
-      gap: 20px;
+      grid-template-columns: 1fr;
+      gap: 24px;
     }
 
+    /* ── Blog card ── */
     .blog-card {
+      --glow: rgba(125, 211, 252, 0);
       display: block;
-      background: var(--panel);
+      position: relative;
+      background: linear-gradient(135deg, var(--panel), var(--panel-2));
       border: 1px solid var(--line);
       border-radius: var(--radius);
-      padding: 28px 32px;
-      transition: border-color 0.2s, transform 0.2s;
+      padding: 36px 40px;
       color: inherit;
+      transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+                  border-color 0.35s ease,
+                  box-shadow 0.35s ease;
+      overflow: hidden;
+      opacity: 0;
+      animation: fadeUp 0.6s ease-out forwards;
+    }
+
+    .blog-card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: var(--radius);
+      background: radial-gradient(600px circle at var(--mx, 50%) var(--my, 50%),
+                    rgba(125, 211, 252, 0.06), transparent 60%);
+      opacity: 0;
+      transition: opacity 0.35s ease;
+      pointer-events: none;
+    }
+
+    .blog-card:hover::before { opacity: 1; }
+
+    .blog-card::after {
+      content: "";
+      position: absolute;
+      top: 16px;
+      right: 20px;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: rgba(125, 211, 252, 0.06);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.3s, transform 0.3s;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='none' stroke='%237dd3fc' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 11L11 5M11 5H6M11 5V10'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: center;
+      opacity: 0;
+      transform: translate(4px, -4px);
+    }
+
+    .blog-card:hover::after {
+      opacity: 1;
+      transform: translate(0, 0);
     }
 
     .blog-card:hover {
-      border-color: var(--line-2);
-      transform: translateY(-2px);
+      border-color: rgba(125, 211, 252, 0.2);
+      transform: translateY(-4px);
+      box-shadow: 0 8px 40px rgba(125, 211, 252, 0.07),
+                  0 0 0 1px rgba(125, 211, 252, 0.05);
+    }
+
+    .blog-card .card-number {
+      font-size: 12px;
+      font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+      color: var(--accent);
+      opacity: 0.4;
+      margin-bottom: 14px;
+      letter-spacing: 0.02em;
     }
 
     .blog-card .card-title {
-      font-size: 20px;
+      font-size: 24px;
       font-weight: 700;
       color: #fff;
-      letter-spacing: -0.01em;
-      margin-bottom: 8px;
-      line-height: 1.3;
-      transition: color 0.15s;
+      letter-spacing: -0.02em;
+      margin-bottom: 10px;
+      line-height: 1.25;
+      transition: color 0.25s;
     }
 
     .blog-card:hover .card-title { color: var(--accent); }
 
     .blog-card .card-meta {
       display: flex;
-      gap: 16px;
+      gap: 18px;
       font-size: 13px;
       font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
       color: var(--ink-faint);
-      margin-bottom: 12px;
+      margin-bottom: 14px;
+    }
+
+    .blog-card .card-meta span {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .meta-dot {
+      width: 3px;
+      height: 3px;
+      border-radius: 50%;
+      background: var(--ink-faint);
+      opacity: 0.5;
     }
 
     .blog-card .card-desc {
-      font-size: 14px;
+      font-size: 15px;
       color: var(--ink-dim);
-      line-height: 1.6;
-      margin-bottom: 16px;
+      line-height: 1.65;
+      margin-bottom: 20px;
     }
 
     .blog-card .card-tags {
@@ -101,30 +307,102 @@
 
     .tag {
       display: inline-block;
-      font-size: 12px;
-      font-weight: 500;
-      padding: 3px 10px;
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      padding: 4px 12px;
       border-radius: 20px;
-      background: rgba(125, 211, 252, 0.10);
+      background: rgba(125, 211, 252, 0.06);
+      border: 1px solid rgba(125, 211, 252, 0.1);
       color: var(--accent);
+      transition: background 0.25s, border-color 0.25s;
+    }
+
+    .blog-card:hover .tag {
+      background: rgba(125, 211, 252, 0.1);
+      border-color: rgba(125, 211, 252, 0.2);
     }
 
     .empty-state {
       text-align: center;
-      padding: 64px 20px;
+      padding: 80px 20px;
       color: var(--ink-faint);
       font-size: 15px;
     }
 
+    /* ── Footer ── */
+    .site-footer {
+      opacity: 0;
+      animation: fadeUp 0.6s ease-out 1.2s forwards;
+    }
+
+    .footer-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .footer-links {
+      display: flex;
+      gap: 20px;
+    }
+
+    .footer-links a {
+      font-size: 13px;
+      color: var(--ink-faint);
+      transition: color 0.2s;
+    }
+
+    .footer-links a:hover { color: var(--accent); }
+
+    /* ── Animations ── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes fadeDown {
+      from { opacity: 0; transform: translateY(-10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes scaleIn {
+      from { opacity: 0; transform: scaleX(0); }
+      to { opacity: 1; transform: scaleX(1); }
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; box-shadow: 0 0 12px rgba(125, 211, 252, 0.5); }
+      50% { opacity: 0.5; box-shadow: 0 0 20px rgba(125, 211, 252, 0.8); }
+    }
+
+    @keyframes gradientShift {
+      0%, 100% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+    }
+
+    /* ── Responsive ── */
     @media (max-width: 560px) {
-      .blog-grid { grid-template-columns: 1fr; }
-      .site-header { padding: 48px 0 32px; }
-      .site-header h1 { font-size: 32px; }
-      .blog-card { padding: 22px 20px; }
+      .site-header { padding: 64px 0 40px; }
+      .site-header h1 { font-size: 44px; }
+      .site-header .sub { font-size: 16px; }
+      .blog-card { padding: 24px 22px; }
+      .blog-card .card-title { font-size: 20px; }
+      .orb { filter: blur(60px); opacity: 0.08; }
     }
   </style>
 </head>
 <body>
+  <!-- Ambient background -->
+  <div class="ambient">
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+  </div>
+  <div class="dot-grid"></div>
+  <div class="mouse-glow" id="mouseGlow"></div>
+
   <nav class="site-nav">
     <div class="wrap">
       <a href="./" class="site-name">iamasx</a>
@@ -136,7 +414,10 @@
       <div class="eyebrow"><span class="dot"></span>Blog</div>
       <h1>Writing</h1>
       <p class="sub">Engineering notes, deep dives, and change logs.</p>
+      <div class="header-line"></div>
     </header>
+
+    <div class="section-label"><span>Recent Posts</span></div>
 
     <div id="blog-list" class="blog-grid"></div>
 
@@ -149,13 +430,38 @@
 
   <footer class="site-footer">
     <div class="wrap">
-      <p>&copy; 2025 iamasx</p>
+      <div class="footer-inner">
+        <p>&copy; 2025 iamasx</p>
+        <div class="footer-links">
+          <a href="https://github.com/iamasx" target="_blank" rel="noopener">GitHub</a>
+        </div>
+      </div>
     </div>
   </footer>
 
   <script src="assets/js/blogs.js"></script>
   <script>
     (function () {
+      // Mouse glow follow
+      var glow = document.getElementById('mouseGlow');
+      document.addEventListener('mousemove', function (e) {
+        glow.style.left = e.clientX + 'px';
+        glow.style.top = e.clientY + 'px';
+      });
+
+      // Card spotlight effect — track mouse position relative to each card
+      document.addEventListener('mousemove', function (e) {
+        var cards = document.querySelectorAll('.blog-card');
+        cards.forEach(function (card) {
+          var rect = card.getBoundingClientRect();
+          var x = e.clientX - rect.left;
+          var y = e.clientY - rect.top;
+          card.style.setProperty('--mx', x + 'px');
+          card.style.setProperty('--my', y + 'px');
+        });
+      });
+
+      // Render blog posts
       var posts = window.BLOG_POSTS || [];
       var container = document.getElementById('blog-list');
 
@@ -173,10 +479,13 @@
         return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
       }
 
-      posts.forEach(function (post) {
+      function padNum(n) { return n < 10 ? '0' + n : '' + n; }
+
+      posts.forEach(function (post, i) {
         var card = document.createElement('a');
         card.href = 'posts/' + post.slug + '/';
         card.className = 'blog-card';
+        card.style.animationDelay = (0.9 + i * 0.12) + 's';
 
         var tagsHtml = '';
         if (post.tags && post.tags.length) {
@@ -186,9 +495,11 @@
         }
 
         card.innerHTML =
+          '<div class="card-number">' + padNum(i + 1) + '</div>' +
           '<div class="card-title">' + post.title + '</div>' +
           '<div class="card-meta">' +
             '<span>' + formatDate(post.date) + '</span>' +
+            '<span class="meta-dot"></span>' +
             '<span>' + post.readingTime + ' read</span>' +
           '</div>' +
           '<div class="card-desc">' + post.description + '</div>' +
